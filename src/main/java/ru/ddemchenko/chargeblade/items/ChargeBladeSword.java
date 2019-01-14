@@ -72,7 +72,7 @@ public class ChargeBladeSword extends Item {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand hand) {
-        if (!player.getHeldItemOffhand().getUnlocalizedName().equals("ite.chargeblade_shield"))
+        if (!player.getHeldItemOffhand().getUnlocalizedName().equals("item.chargeblade_shield"))
             return super.onItemRightClick(worldIn, player, hand);
 
         if (worldIn.isRemote)
