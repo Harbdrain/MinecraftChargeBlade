@@ -15,6 +15,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import ru.ddemchenko.chargeblade.ChargeBlade;
 import ru.ddemchenko.chargeblade.Vars;
+import ru.ddemchenko.chargeblade.config.ChargeBladeConfig;
 
 import java.util.List;
 
@@ -28,9 +29,6 @@ public class ChargeBladeSword extends Item {
 
     @Override
     public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        if (!attacker.getHeldItemOffhand().getUnlocalizedName().equals("item.chargeblade_shield"))
-            return super.hitEntity(stack, target, attacker);
-
         setNbtTags(stack);
 
         NBTTagCompound nbt = stack.getTagCompound();
@@ -39,7 +37,7 @@ public class ChargeBladeSword extends Item {
 
         if (!axe) {
             if (warmth < Vars.maxWarmth) {
-                target.attackEntityFrom(DamageSource.GENERIC, 5);
+                target.attackEntityFrom(DamageSource.GENERIC, ChargeBladeConfig.damageSwordMode);
                 nbt.setInteger("warmth", warmth + 1);
             }
             else {
@@ -49,7 +47,7 @@ public class ChargeBladeSword extends Item {
             return super.hitEntity(stack, target, attacker);
         }
 
-        target.attackEntityFrom(DamageSource.GENERIC, flasks > 0 ? 8 : 1);
+        target.attackEntityFrom(DamageSource.GENERIC, flasks > 0 ? ChargeBladeConfig.damageAxeMode : 1);
         nbt.setInteger("flasks", Math.max(flasks - 1, 0));
         stack.setTagCompound(nbt);
         return super.hitEntity(stack, target, attacker);
@@ -57,9 +55,6 @@ public class ChargeBladeSword extends Item {
 
     @Override
     public boolean onEntitySwing(EntityLivingBase entityLiving, ItemStack stack) {
-        if (!entityLiving.getHeldItemOffhand().getUnlocalizedName().equals("item.chargeblade_shield"))
-            return super.onEntitySwing(entityLiving, stack);
-
         setNbtTags(stack);
 
         if (entityLiving.isSneaking()) {
@@ -72,9 +67,6 @@ public class ChargeBladeSword extends Item {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand hand) {
-        if (!player.getHeldItemOffhand().getUnlocalizedName().equals("item.chargeblade_shield"))
-            return super.onItemRightClick(worldIn, player, hand);
-
         if (worldIn.isRemote)
             return super.onItemRightClick(worldIn, player, hand);
 
@@ -82,10 +74,21 @@ public class ChargeBladeSword extends Item {
         NBTTagCompound nbt = player.getHeldItemMainhand().getTagCompound();
         boolean axe = nbt.getBoolean("axe");
         int warmth = nbt.getInteger("warmth"), flasks = nbt.getInteger("flasks");
+
+
         if (axe && player.isSneaking()) {
             chargedRmb(player);
             return super.onItemRightClick(worldIn, player, hand);
         }
+        if (axe && !player.isSneaking()) {
+            player.addPotionEffect(new PotionEffect(MobEffects.SPEED, 600*flasks, ChargeBladeConfig.potionSPEEDlvl));
+            player.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 600*flasks, ChargeBladeConfig.potionREGENERATIONlvl));
+
+            nbt.setInteger("flasks", 0);
+            player.getHeldItemMainhand().setTagCompound(nbt);
+            return super.onItemRightClick(worldIn, player, hand);
+        }
+
         if (!axe && player.isSneaking()) {
             if (warmth >= 4)
                 nbt.setInteger("flasks", 6);
@@ -95,10 +98,11 @@ public class ChargeBladeSword extends Item {
             player.getHeldItemMainhand().setTagCompound(nbt);
             return super.onItemRightClick(worldIn, player, hand);
         }
+
         if (!axe && !player.isSneaking()) {
-            player.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 20, 4));
+            player.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 20, ChargeBladeConfig.potionRESISTANCElvl));
             player.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 20, 100));
-            player.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 20, 5));
+            player.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 20, ChargeBladeConfig.potionSLOWNESSlvl));
             return super.onItemRightClick(worldIn, player, hand);
         }
 
@@ -115,6 +119,7 @@ public class ChargeBladeSword extends Item {
         NBTTagCompound nbt = player.getHeldItemMainhand().getTagCompound();
         flasks = nbt.getInteger("flasks");
         for (int i = 0; i < flasks; i++) {
+            player.world.createExplosion(null,pX + i * vec.x, pY + i * vec.y, pZ + i * vec.z, 0f, true);
             damageEntity(player,pX + i * vec.x, pY + i * vec.y, pZ + i * vec.z);
         }
 
@@ -122,13 +127,15 @@ public class ChargeBladeSword extends Item {
         player.getHeldItemMainhand().setTagCompound(nbt);
     }
 
+
+
     private static void damageEntity(EntityLivingBase player, double pX, double pY, double pZ) {
         double radius = 3;
         AxisAlignedBB bb = new AxisAlignedBB(pX - radius, pY - radius, pZ - radius, pX + radius, pY + radius, pZ + radius);
         List<EntityLivingBase> list = player.world.getEntitiesWithinAABB(EntityLivingBase.class, bb);
         for (EntityLivingBase entity : list) {
             if (!(entity instanceof EntityPlayer)) {
-                entity.setHealth(entity.getHealth() - 9);
+                entity.setHealth(entity.getHealth() - ChargeBladeConfig.damageDischarge);
                 entity.attackEntityFrom(DamageSource.GENERIC, 1);
                 entity.knockBack(player, 0.25f, -player.getLookVec().x, -player.getLookVec().z);
             }

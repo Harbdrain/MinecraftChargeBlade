@@ -14,7 +14,7 @@ public class RenderGuiHandler {
     {
         if (event.getType() != RenderGameOverlayEvent.ElementType.EXPERIENCE) return;
         Minecraft mc = Minecraft.getMinecraft();
-        if(mc.player.getHeldItemMainhand().getUnlocalizedName().equals("item.chargeblade_sword") && mc.player.getHeldItemOffhand().getUnlocalizedName().equals("item.chargeblade_shield")) {
+        if(mc.player.getHeldItemMainhand().getUnlocalizedName().equals("item.chargeblade_sword")) {
             NBTTagCompound nbt = new NBTTagCompound();
             int flasks = 0, warmth = 0;
             if (mc.player.getHeldItemMainhand().hasTagCompound())
