@@ -58,11 +58,15 @@ public class ChargeBladeSword extends Item {
         setNbtTags(stack);
 
         if (entityLiving.isSneaking()) {
-            NBTTagCompound nbt = stack.getTagCompound();
-            nbt.setBoolean("axe", !nbt.getBoolean("axe"));
-            stack.setTagCompound(nbt);
+            switchMode(stack);
         }
         return super.onEntitySwing(entityLiving, stack);
+    }
+
+    public static void switchMode(ItemStack stack) {
+        NBTTagCompound nbt = stack.getTagCompound();
+        nbt.setBoolean("axe", !nbt.getBoolean("axe"));
+        stack.setTagCompound(nbt);
     }
 
     @Override
