@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import ru.ddemchenko.chargeblade.init.ModItems;
+import ru.ddemchenko.chargeblade.packets.ChargeBladePacketHandler;
 import ru.ddemchenko.chargeblade.proxy.CommonProxy;
 import ru.ddemchenko.chargeblade.tab.ChargeBladeCreativeTab;
 
@@ -31,6 +32,7 @@ public class ChargeBlade
         tab = new ChargeBladeCreativeTab(CreativeTabs.getNextID(), "tab_chargeblade");
         ModItems.init();
         Vars.init();
+        ChargeBladePacketHandler.init();
         proxy.preInit(event);
     }
 

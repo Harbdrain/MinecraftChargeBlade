@@ -21,10 +21,10 @@ import java.util.List;
 
 public class ChargeBladeSword extends Item {
     public ChargeBladeSword(String name) {
-        setUnlocalizedName(name);
-        setRegistryName(name);
-        setMaxStackSize(1);
-        setCreativeTab(ChargeBlade.tab);
+        this.setUnlocalizedName(name);
+        this.setRegistryName(name);
+        this.setMaxStackSize(1);
+        this.setCreativeTab(ChargeBlade.tab);
     }
 
     @Override
@@ -55,8 +55,6 @@ public class ChargeBladeSword extends Item {
 
     @Override
     public boolean onEntitySwing(EntityLivingBase entityLiving, ItemStack stack) {
-        setNbtTags(stack);
-
         if (entityLiving.isSneaking()) {
             switchMode(stack);
         }
@@ -64,6 +62,7 @@ public class ChargeBladeSword extends Item {
     }
 
     public static void switchMode(ItemStack stack) {
+        setNbtTags(stack);
         NBTTagCompound nbt = stack.getTagCompound();
         nbt.setBoolean("axe", !nbt.getBoolean("axe"));
         stack.setTagCompound(nbt);
@@ -146,7 +145,7 @@ public class ChargeBladeSword extends Item {
         }
     }
 
-    private static void setNbtTags(ItemStack stack) {
+     private static void setNbtTags(ItemStack stack) {
         NBTTagCompound nbt = new NBTTagCompound();
         boolean axe = false;
         int flasks = 0, warmth = 0;

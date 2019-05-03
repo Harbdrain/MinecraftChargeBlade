@@ -9,16 +9,17 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.lwjgl.input.Keyboard;
 import ru.ddemchenko.chargeblade.ChargeBlade;
+import ru.ddemchenko.chargeblade.ChargeBladeEventHandler;
 import ru.ddemchenko.chargeblade.gui.RenderGuiHandler;
 import ru.ddemchenko.chargeblade.init.ModItems;
 
 public class ClientProxy extends CommonProxy {
-
     public static KeyBinding[] keyBindings;
 
     @Override
@@ -44,6 +45,13 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void init(FMLInitializationEvent event) {
         super.init(event);
+    }
+
+    @Override
+    public void postInit(FMLPostInitializationEvent event) {
+        MinecraftForge.EVENT_BUS.register(new RenderGuiHandler());
+        MinecraftForge.EVENT_BUS.register(ChargeBladeEventHandler.class);
+        super.postInit(event);
 
         keyBindings = new KeyBinding[1];
 
@@ -52,11 +60,5 @@ public class ClientProxy extends CommonProxy {
         for (int i = 0; i < keyBindings.length; i++) {
             ClientRegistry.registerKeyBinding(keyBindings[i]);
         }
-    }
-
-    @Override
-    public void postInit(FMLPostInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(new RenderGuiHandler());
-        super.postInit(event);
     }
 }
